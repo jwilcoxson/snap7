@@ -4,7 +4,7 @@
 ##
 TargetCPU  :=x86_64
 OS         :=osx
-CXXFLAGS   := -O3 -fPIC -pedantic
+CXXFLAGS   := -O3 -fPIC -pedantic -std=c++11
 
 # Standard part
 
