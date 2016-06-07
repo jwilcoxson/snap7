@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
     Server->RegisterArea(srvAreaDB, 103, &DB103, sizeof(DB103));
     Server->RegisterArea(srvAreaDB, 3, &DB3, sizeof(DB3));
 
-    // We mask the read event to avoid the double trigger for the same event
+    // We mask the read event to avoid the double trigger for the same event                  
     Server->SetEventsMask(~evcDataRead);
     Server->SetEventsCallback(EventCallBack, NULL);
     // Set the Read Callback

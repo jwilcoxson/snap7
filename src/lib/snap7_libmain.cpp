@@ -69,7 +69,7 @@ BOOL APIENTRY DllMain (HINSTANCE hInst,
 // CLIENT
 //***************************************************************************
 S7Object S7API Cli_Create()
-{
+{    
     return S7Object(new TSnap7Client());
 }
 //---------------------------------------------------------------------------
@@ -806,15 +806,6 @@ int S7API Srv_SetParam(S7Object Server, int ParamNumber, void *pValue)
         return errLibInvalidObject;
 }
 //---------------------------------------------------------------------------
-int S7API Srv_SetSZL(S7Object Server, int SZLID, pbyte Val, int len)
-{
-    if (Server) {
-        PSnap7Server(Server)->SetSZL(SZLID, Val, len);
-    	return 0;
-    } else
-        return errLibInvalidObject;
-}
-//---------------------------------------------------------------------------
 int S7API Srv_StartTo(S7Object Server, const char *Address)
 {
     if (Server)
@@ -840,45 +831,6 @@ int S7API Srv_Stop(S7Object Server)
     }
     else
         return errLibInvalidObject;
-}
-//---------------------------------------------------------------------------
-int Srv_GetDiagRequest(S7Object Server, longword id, byte job_id, RequestDiag*& rd) {
-    if (Server) {
-        rd = PSnap7Server(Server)->GetDiagRequest(id, job_id);
-        return 0;
-    } else
-        return errLibInvalidObject;
-}
-//---------------------------------------------------------------------------
-int Srv_AddDiagResponse(S7Object Server, longword id, byte job_id, ResponseDiag* rd) {
-    if (Server)
-        return PSnap7Server(Server)->AddDiagResponse(id, job_id, rd);
-    else
-        return errLibInvalidObject;
-}
-//---------------------------------------------------------------------------
-int S7API Srv_AddBlock(S7Object Server, void *pBinary, int Size) {
-    if (Server)
-        return PSnap7Server(Server)->AddBlock(pBinary, Size);
-    else
-        return errLibInvalidObject;
-}
-//---------------------------------------------------------------------------
-int S7API Srv_AddDiagItem(S7Object Server, pbyte Item) {
-    if (Server) {
-        PSnap7Server(Server)->AddDiagItem(Item);
-        return 0;
-    } else
-        return errLibInvalidObject;
-}
-//---------------------------------------------------------------------------
-int S7API Srv_GetBlock(S7Object Server, byte BlkType, word BlkNum, pbyte &block) {
-    if (Server) {
-        block = PSnap7Server(Server)->GetBlock(BlkType, BlkNum);
-        return 0;
-    } else
-        return errLibInvalidObject;
-
 }
 //---------------------------------------------------------------------------
 int S7API Srv_RegisterArea(S7Object Server, int AreaCode, word Index, void *pUsrData, int Size)
@@ -930,7 +882,7 @@ int S7API Srv_SetCpuStatus(S7Object Server, int CpuStatus)
 {
 	if (Server)
 	{
-		PSnap7Server(Server)->SetCpuStatus(CpuStatus);
+		PSnap7Server(Server)->CpuStatus=CpuStatus;
 		return 0;
 	}
 	else

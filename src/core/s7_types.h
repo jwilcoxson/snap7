@@ -27,7 +27,6 @@
 #define s7_types_h
 //------------------------------------------------------------------------------
 #include "s7_isotcp.h"
-#include <map>
 //------------------------------------------------------------------------------
 //                               EXPORT CONSTANTS
 // Everything added in this section has to be copied into wrappers interface
@@ -85,7 +84,6 @@ const byte BlockLangFUP       = 0x03;
 const byte BlockLangSCL       = 0x04;
 const byte BlockLangDB        = 0x05;
 const byte BlockLangGRAPH     = 0x06;
-const byte BlockLangSDB       = 0x11;
 
   // CPU status
 const byte S7CpuStatusUnknown = 0x00;
@@ -105,7 +103,7 @@ const longword evcDownload            = 0x00800000;
 const longword evcDirectory           = 0x01000000;
 const longword evcSecurity            = 0x02000000;
 const longword evcControl             = 0x04000000;
-const longword evcGroupProgrammer     = 0x08000000;
+const longword evcReserved_08000000   = 0x08000000;
 const longword evcReserved_10000000   = 0x10000000;
 const longword evcReserved_20000000   = 0x20000000;
 const longword evcReserved_40000000   = 0x40000000;
@@ -122,11 +120,6 @@ const word evsGetClock                = 0x0001;
 const word evsSetClock                = 0x0002;
 const word evsSetPassword             = 0x0001;
 const word evsClrPassword             = 0x0002;
-const word evsGPStatic                = 0x0001;
-const word evsGPBlink                 = 0x0002;
-const word evsGPRequestDiag           = 0x0003;
-const word evsGPReadDiag              = 0x0004;
-const word evsGPRemoveDiag            = 0x0005;
 // Event Result
 const word evrNoError                 = 0;
 const word evrFragmentRejected        = 0x0001;
@@ -152,22 +145,13 @@ const int amPolling   = 0;
 const int amEvent     = 1;
 const int amCallBack  = 2;
 
-const byte DIAG_REGISTER_STATUS = 0x01;
-const byte DIAG_REGISTER_AKKU1  = 0x02;
-const byte DIAG_REGISTER_AKKU2  = 0x04;
-const byte DIAG_REGISTER_AREG1  = 0x08;
-const byte DIAG_REGISTER_AREG2  = 0x10;
-const byte DIAG_REGISTER_DB     = 0x20;
-const byte DIAG_REGISTER_DI     = 0x40;
-
-
 //------------------------------------------------------------------------------
-//                                  PARAMS LIST
+//                                  PARAMS LIST            
 // Notes for Local/Remote Port
 //   If the local port for a server and remote port for a client is != 102 they
 //   will be *no more compatible with S7 IsoTCP*
 //   A good reason to change them could be inside a debug session under Unix.
-//   Increasing the port over 1024 avoids the need of be root.
+//   Increasing the port over 1024 avoids the need of be root. 
 //   Obviously you need to work with the couple Snap7Client/Snap7Server and change
 //   both, or, use iptable and nat the port.
 //------------------------------------------------------------------------------
@@ -190,12 +174,12 @@ const int p_u32_KeepAliveTime   = 15;
 // Bool param is passed as int32_t : 0->false, 1->true
 // String param (only set) is passed as pointer
 
-typedef int16_t   *Pint16_t;
-typedef uint16_t  *Puint16_t;
-typedef int32_t   *Pint32_t;
-typedef uint32_t  *Puint32_t;
-typedef int64_t   *Pint64_t;
-typedef uint64_t  *Puint64_t;
+typedef int16_t   *Pint16_t;     
+typedef uint16_t  *Puint16_t;     
+typedef int32_t   *Pint32_t;     
+typedef uint32_t  *Puint32_t;     
+typedef int64_t   *Pint64_t;     
+typedef uint64_t  *Puint64_t;     
 typedef uintptr_t *Puintptr_t;
 //-----------------------------------------------------------------------------
 //                               INTERNALS CONSTANTS
@@ -235,11 +219,6 @@ const byte TS_ResOctet = 0x09;
 const int JobComplete  = 0;
 const int JobPending   = 1;
 
-// SZL identifiers (lib internals, not S7)
-const int SZL_ID_0011 = 0;
-const int SZL_ID_001C = 1;
-const int SZL_ID_0091 = 2;
-
 // Control codes
 const word CodeControlUnknown   = 0;
 const word CodeControlColdStart = 1;      // Cold start
@@ -273,20 +252,13 @@ const byte pduControl   	= 0x28;   // Control (insert/delete..)
 const byte SFun_ListAll   	= 0x01;   // List all blocks
 const byte SFun_ListBoT   	= 0x02;   // List Blocks of type
 const byte SFun_BlkInfo   	= 0x03;   // Get Block info
-const byte SFun_ReadSZL   	= 0x01;   // Read SZL
+const byte SFun_ReadSZL   	= 0x01;   // Read SZL 
 const byte SFun_ReadClock   = 0x01;   // Read Clock (Date and Time)
 const byte SFun_SetClock  	= 0x02;   // Set Clock (Date and Time)
 const byte SFun_EnterPwd    = 0x01;   // Enter password    for this session
 const byte SFun_CancelPwd   = 0x02;   // Cancel password    for this session
 const byte SFun_Insert   	= 0x50;   // Insert block
 const byte SFun_Delete   	= 0x42;   // Delete block
-const byte SFun_Blink       = 0x16;   // blink LED
-const byte SFun_Forces      = 0x10;   // blink LED
-const byte SFun_ReqDiagT1   = 0x01;   // request diag data type 1
-const byte SFun_VarTab      = 0x02;   // variable table
-const byte SFun_ReqDiagT2   = 0x13;   // request diag data type 2
-const byte SFun_ReadDiag    = 0x0E;   // read diag data
-const byte SFun_RemoveDiag  = 0x0F;   // remove diag data
 
 typedef tm *PTimeStruct;
 
@@ -1089,70 +1061,6 @@ typedef struct {
 }TBSendResData;
 
 typedef TBSendResData* PBSendResData;
-
-//==============================================================================
-//                             GROUP PROGRAMMER
-//==============================================================================
-
-typedef struct {
-	byte    FF;			// 0xFF
-	byte    TRSize;		// Transport Size 0x09 (octet)
-	word    DataLength;	// following data length (bytes)
-	byte    Data [IsoPayload_Size - 17];
-} TGPData;
-
-typedef TGPData TGPResData;
-typedef TGPResData* PGPResData;
-typedef TGPData TGPReqData;
-typedef TGPReqData* PGPReqData;
-
-typedef TS7Params7 TGPResParams;
-typedef TGPResParams* PGPResParams;
-typedef TS7Params7 TGPReqParams;
-typedef TGPReqParams* PGPReqParams;
-
-typedef struct {
-    byte block_type;
-    word block_no;
-    word start_address;
-    word saz;
-    word lines;
-    byte initial_registers;
-    // key is line, value is selected registers
-    std::map<word, byte> line_registers;
-} RequestDiag;
-
-typedef struct {
-    word offset;
-    longword akku1;
-    longword akku2;
-    longword areg1;
-    longword areg2;
-    word db_no;
-    word di_no;
-    word status_word;
-} DiagDataLine;
-
-typedef struct {
-    // initial values
-    DiagDataLine initial;
-    // diag lines for each selected and executed line
-    std::map<word, DiagDataLine> lines;
-    bool ready;
-} ResponseDiag;
-
-typedef struct {
-    byte uk1_0;
-    byte uk2_4;
-    word answer_length;
-    byte uk3_1;
-    byte uk4_0;
-    byte uk5_0;
-    byte uk6_1;
-    byte uk7_0;
-    byte uk8_0;
-    byte diag_lines;
-} ResponseDiagData;
 
 #pragma pack()
 #endif // s7_types_h

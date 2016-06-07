@@ -24,7 +24,6 @@
 |  If not, see  http://www.gnu.org/licenses/                                   |
 |=============================================================================*/
 #include "s7_micro_client.h"
-#include <stdio.h>
 //---------------------------------------------------------------------------
 
 TSnap7MicroClient::TSnap7MicroClient()
@@ -387,7 +386,7 @@ int TSnap7MicroClient::opReadMultiVars()
     };
 
     IsoSize=RPSize+sizeof(TS7ReqHeader);
-	if (IsoSize>PDULength)
+	if (IsoSize>PDULength) 
 		return errCliSizeOverPDU;
 	Result=isoExchangeBuffer(0,IsoSize);
 
@@ -558,7 +557,7 @@ int TSnap7MicroClient::opWriteMultiVars()
     PDUH_out->DataLen=SwapWord(word(Offset));
 
     IsoSize=RPSize+sizeof(TS7ReqHeader)+int(Offset);
-	if (IsoSize>PDULength)
+	if (IsoSize>PDULength) 
 		return errCliSizeOverPDU;
     Result=isoExchangeBuffer(0,IsoSize);
 
@@ -1289,7 +1288,7 @@ int TSnap7MicroClient::opDownload()
             // Init Params
             ReqParams->FunSDwnld = pduReqDownload;
             ReqParams->Uk6[0]=0x00;
-            ReqParams->Uk6[1]=0x01;
+            ReqParams->Uk6[1]=0x00;
             ReqParams->Uk6[2]=0x00;
             ReqParams->Uk6[3]=0x00;
             ReqParams->Uk6[4]=0x00;
@@ -2511,8 +2510,7 @@ int TSnap7MicroClient::CheckBlock(int BlockType, int BlockNum,  void * pBlock,  
           return errCliInvalidBlockSize;
 
   // Check the presence of the footer
-  //printf("%d + %ld > %d\n", SwapWord(Info->MC7Len), sizeof(TS7CompactBlockInfo), u_int(Size));
-  if (SwapWord(Info->MC7Len)+sizeof(TS7CompactBlockInfo)>u_int(Size))
+  if (SwapWord(Info->MC7Len)+sizeof(TS7CompactBlockInfo)>=u_int(Size))
     return errCliInvalidBlockSize;
 
   return 0;
